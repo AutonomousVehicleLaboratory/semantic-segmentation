@@ -208,7 +208,8 @@ class MscaleOCR(nn.Module):
         Output:
           If training, return loss, else return prediction + attention
         """
-        x_1x = inputs['images']
+        x_1x = x_1x = inputs # inputs['images']
+
 
         assert 1.0 in scales, 'expected 1.0 to be the target scale'
         # Lower resolution provides attention for higher rez predictions,
@@ -259,7 +260,7 @@ class MscaleOCR(nn.Module):
             return loss
         else:
             output_dict['pred'] = pred
-            return output_dict
+            return torch.argmax(pred, dim=1) # output_dict
 
     def two_scale_forward(self, inputs):
         """
@@ -271,7 +272,7 @@ class MscaleOCR(nn.Module):
         we can use normal weighting for aux vs. cls outputs
         """
         assert 'images' in inputs
-        x_1x = inputs['images']
+        x_1x = inputs # inputs['images']
 
         x_lo = ResizeX(x_1x, cfg.MODEL.MSCALE_LO_SCALE)
         lo_outs = self._fwd(x_lo)
@@ -324,7 +325,7 @@ class MscaleOCR(nn.Module):
                 'pred_10x': pred_10x,
                 'attn_05x': attn_05x,
             }
-            return output_dict
+            return torch.argmax(joint_pred, dim=1) # output_dict
 
     def forward(self, inputs):
         
