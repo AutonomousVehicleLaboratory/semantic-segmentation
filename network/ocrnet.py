@@ -37,7 +37,7 @@ from network.utils import make_attn_head
 from network.ocr_utils import SpatialGather_Module, SpatialOCR_Module
 from config import cfg
 from utils.misc import fmt_scale
-
+import torch
 
 class OCR_block(nn.Module):
     """
