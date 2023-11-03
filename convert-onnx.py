@@ -9,7 +9,6 @@ import torch
 from torch.autograd import Variable
 import torch.onnx as torch_onnx
 import onnx
-import torch_tensorrt
 
 from apex import amp
 from runx.logx import logx
@@ -253,6 +252,8 @@ parser.add_argument('--supervised_mscale_loss_wt', type=float, default=None,
                     help='weighting for the supervised loss')
 parser.add_argument('--ocr_aux_loss_rmi', action='store_true', default=False,
                     help='allow rmi for aux loss')
+parser.add_argument('--cpu', action='store_true', default=False,
+                    help='use cpu for conversion')
 
 args = parser.parse_args()
 args.best_record = {'epoch': -1, 'iter': 0, 'val_loss': 1e10, 'acc': 0,
@@ -386,8 +387,12 @@ def main():
     torch.cuda.empty_cache()
 
     # onnx conversion
-    img_input = torch.randn(1, 3, 1440 // 2, 1920 // 2).cuda()
-    net.eval()
+    if args.cpu:
+        img_input = torch.randn(1, 3, 1440 // 2, 1920 // 2).cpu()
+        net.eval().cpu()    
+    else:
+        img_input = torch.randn(1, 3, 1440 // 2, 1920 // 2).cuda()
+        net.eval()
 
     inputs = {'images': img_input}
     inputs = {k: v.cuda() for k, v in inputs.items()}
