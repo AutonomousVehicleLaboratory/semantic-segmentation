@@ -397,7 +397,8 @@ def main():
     inputs = {'images': img_input}
     inputs = {k: v.cuda() for k, v in inputs.items()}
 
-    torch.onnx.export(net.module, img_input, "hrnet-avl-map.onnx", verbose=True)
+    # torch.onnx.export(net.module, img_input, "hrnet-avl-map.onnx", verbose=True)
+    torch.onnx.export(net.module, img_input, "hrnet-avl-map.onnx", verbose=True, opset_version=11)
 
     # trt_model_fp32 = torch_tensorrt.compile(net.module, inputs = torch_tensorrt.Input((1, 3, 1024, 2048), dtype=torch.float32),
     #     enabled_precisions = torch.float32, # Run with FP32
